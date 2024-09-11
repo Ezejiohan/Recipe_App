@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
-
-const adminSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     firstname: {
         type: String,
         required: [true, "Firstname must be provided"],
         trim: true,
-        maxlength: [15, "Firstname must not have more than 15 characters"]
+        maxlength: [20, "Firstname must not be more than 20 characters"]
     },
     lastname: {
         type: String,
@@ -27,7 +26,7 @@ const adminSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-})
+});
 
-const Admin = mongoose.model('Admin', adminSchema);
-module.exports = Admin;
+const User = mongoose.model('User', userSchema);
+module.exports = User;
