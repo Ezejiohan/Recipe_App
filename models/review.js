@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 const reviewSchema = new mongoose.Schema({
-    recipe: {
+    recipeId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Recipe',
         required: true
     },
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
