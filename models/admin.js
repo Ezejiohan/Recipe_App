@@ -5,13 +5,13 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: [true, "Firstname must be provided"],
         trim: true,
-        maxlength: [15, "Firstname must not have more than 15 characters"]
+        maxlength: [25, "Firstname must not have more than 25 characters"]
     },
     lastname: {
         type: String,
         required: [true, "Lastname must be provided"],
         trim: true,
-        maxlength: [15, "Lastname must not be more than 15 characters"]
+        maxlength: [25, "Lastname must not be more than 25 characters"]
     },
     email: {
         type: String,
@@ -21,7 +21,7 @@ const adminSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password must be 10 characters long and include at least one uppercase and one special character"],
-        maxlength: [10, "Password must not be more than 10 characters"]
+        maxlength: [50, "Password must not be more than 50 characters"]
     },
     verified: {
         type: Boolean,
@@ -29,5 +29,5 @@ const adminSchema = new mongoose.Schema({
     }
 })
 
-const Admin = mongoose.model('Admin', adminSchema);
+const Admin = mongoose.model('Admins', adminSchema);
 module.exports = Admin;

@@ -12,9 +12,8 @@ app.use('/', route);
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
-
-const PORT = 7000;
+const PORT = 7000
 
 app.listen(process.env.PORT, () => {
-    console.log('app is listenting on port ' + process.env.PORT)
+    console.log('app is listenting on PORT ' + process.env.PORT)
 });

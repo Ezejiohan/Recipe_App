@@ -4,13 +4,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Firstname must be provided"],
         trim: true,
-        maxlength: [20, "Firstname must not be more than 20 characters"]
+        maxlength: [30, "Firstname must not be more than 30 characters"]
     },
     lastname: {
         type: String,
         required: [true, "Lastname must be provided"],
         trim: true,
-        maxlength: [15, "Lastname must not be more than 15 characters"]
+        maxlength: [30, "Lastname must not be more than 30 characters"]
     },
     email: {
         type: String,
@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Password must be 10 characters long and include at least one uppercase and one special character"],
-        maxlength: [10, "Password must not be more than 10 characters"]
+        maxlength: [50, "Password must not be more than 50 characters"]
     },
     verified: {
         type: Boolean,
@@ -28,5 +28,5 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('Users', userSchema);
 module.exports = User;

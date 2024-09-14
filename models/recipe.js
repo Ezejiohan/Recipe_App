@@ -1,25 +1,21 @@
 const mongoose = require('mongoose');
 const recipeSchema = new mongoose.Schema({
-    recipeName: {
+    name: {
         type: String,
         required: true
     },
-    ingredient: [
-        {
+    ingredient: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Ingredient',
+            ref: 'Ingredients',
             required: true
-        }
-    ],
-    steps: [
-        {
+    }],
+    steps: [{
             type: String,
             required: true
-        }
-    ],
+    }],
     admin: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
+        ref: 'Admins',
         required: true
     },
     estimatedCookingTime: {
@@ -29,11 +25,8 @@ const recipeSchema = new mongoose.Schema({
     serving: {
         type: Number,
         required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
+    }
+    
 });
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
