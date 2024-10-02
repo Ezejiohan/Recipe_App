@@ -2,11 +2,11 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const asyncWrapper = require('../middleware/async');
-const {createCustomError} = require('../errors/custom_error');
+const { createCustomError } = require('../errors/custom_error');
 
 const createUser = asyncWrapper(async(req, res, next) => {
     const { firstname, lastname, email, password } = req.body;
-    const userExist = await User.findOne({email})
+    const userExist = await User.findOne({ email })
     if (userExist) {
         return next(createCustomError("User already exist", 403))
     }

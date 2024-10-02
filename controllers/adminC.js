@@ -6,7 +6,7 @@ const { createCustomError } = require('../errors/custom_error');
 
 const createAdmin = asyncWrapper(async (req, res, next) => {
     const { firstname, lastname, email, password } = req.body
-    const adminExist = await Admin.findOne({email});
+    const adminExist = await Admin.findOne({ email });
     if (adminExist) {
         return next(createCustomError("Admin already exist", 403));
     }
