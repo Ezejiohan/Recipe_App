@@ -6,7 +6,7 @@ const app = express();
 const {notFound} = require('./middleware/not_found');
 const errorHandlerMiddleware = require('./middleware/errorHandler');
 
-app.use(express());
+app.use(express.json());
 app.use('/admins', route);
 app.use('/users', userRoute);
 app.use(notFound);

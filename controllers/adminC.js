@@ -10,8 +10,8 @@ const createAdmin = asyncWrapper(async (req, res, next) => {
     if (adminExist) {
         return next(createCustomError("Admin already exist", 403));
     }
-    const salt = bcrypt.genSaltSync(10);
-    const hashPassword = bcrypt.hashSync(password, salt);
+    const saltPassword = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(password, saltPassword);
 
     const newAdmin = await registerAdmin({
         firstname,
