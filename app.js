@@ -12,4 +12,4 @@ app.use('/', userRoute);
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
-module.exports = app
+module.exports = app;
