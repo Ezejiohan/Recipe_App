@@ -20,8 +20,8 @@ const adminSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Password must be 10 characters long and include at least one uppercase and one special character"],
-        maxlength: [50, "Password must not be more than 50 characters"]
+        required: [true, "Password must be required"],
+        maxlength: 1024
     },
     verified: {
         type: Boolean,
