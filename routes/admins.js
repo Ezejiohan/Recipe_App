@@ -1,10 +1,13 @@
 const express = require('express');
-const { createAdmin, adminLogin, adminChangePassword } = require('../controllers/adminC');
+
+const { createAdmin, adminResetPassword, adminLogin, adminForgotPassword, adminChangePassword } = require('../controllers/adminC');
 
 const route = express.Router();
 
-route.post('/admins/createAdmin', (createAdmin));
-route.post('/admins/adminLogin', (adminLogin));
-route.put('/admins/adminChangePassword', (adminChangePassword));
+route.post('/register', (createAdmin));
+route.patch('/:id/:token', (adminResetPassword));
+route.post('/adminLogin', (adminLogin));
+route.post('/adminForgotPassword', (adminForgotPassword));
+route.put('/adminChangePassword/:id', (adminChangePassword));
 
-module.exports = { route }
+module.exports = { route };
