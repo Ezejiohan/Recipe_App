@@ -23,6 +23,57 @@ const createAdmin = asyncWrapper(async (req, res, next) => {
     res.status(201).json({ msg: 'Admin created successfully', admin: newAdmin });
 });
 
+const adminLogin = asyncWrapper(async (req, res, next) => {
+    const loginRequest = { email: req.body.email, password: req.body.password }
+    const admin = await fetchAdmin({ email: req.body.email });
+    if (!admin) {
+        return next(createCustomError("Admin not found", 404));
+    }
+    const correctPassword = await bcrypt.compare(loginRequest.password, admin.password);
+    if (correctPassword === false) {
+        return next(createCustomError("Invalid email or password", 404));
+    }
+    const generatedToken = jwt.sign({
+        id: admin._id,
+        email: admin.email,
+    }, secretKey, { expiresIn: '12h' });
+    const result = {
+        id: admin._id,
+        email: admin.email,
+        token: generatedToken
+    }
+    return res.status(200).json({ msg: "login successful", result });
+});
+
+const adminChangePassword = asyncWrapper(async (req, res, next) => {
+    const { oldPassword, newPassword } = req.body;
+    const admin = await fetchAdmin({ email: req.body.email })
+
+    const comparePassword = await bcrypt.compare(oldPassword, admin.password)
+    if (comparePassword !== true) {
+        return next(createCustomError("Password incorrect", 404))
+    }
+    const saltPassword = bcrypt.genSaltSync(10)
+    const hashPassword = bcrypt.hashSync(newPassword, saltPassword);
+
+    if (newPassword === oldPassword) {
+        return next(createCustomError("Unauthorized", 404));
+    }
+    admin.password = hashPassword
+    sendEmail({
+        email: admin.email,
+        subject: "Password change alert",
+        message: "You have changed your password. If not you alert us"
+    });
+    const result = {
+        fullname: admin.fullname,
+        email: admin.email
+    }
+    await admin.save();
+
+    return res.status(200).json({ msg: "Password changed successful", result });
+});
+
 const adminForgotPassword = asyncWrapper(async (req, res, next) => {
     const admin = await fetchAdmin({ email: req.body.email });
     if (!admin) {
@@ -47,29 +98,6 @@ const adminForgotPassword = asyncWrapper(async (req, res, next) => {
     });
 });
 
-const adminLogin = asyncWrapper(async (req, res, next) => {
-    const loginRequest = { email: req.body.email, password: req.body.password }
-    const admin = await fetchAdmin({ email: req.body.email });
-    if (!admin) {
-        return next(createCustomError("Admin not found", 404))
-    }
-    const correctPassword = await bcrypt.compare(loginRequest.password, admin.password);
-    if (correctPassword === false) {
-        return next(createCustomError('Invalid email or password', 404))
-    } else {
-        const generatedToken = jwt.sign({
-            id: admin._id,
-            email: admin.email,
-        }, process.env.TOKEN, { expiresIn: '12h' });
-        const result = {
-            id: admin._id,
-            email: admin.email,
-            token: generatedToken
-        }
-        return res.status(200).json({ result });
-    }
-});
-
 const adminResetPassword = asyncWrapper(async (req, res, next) => {
     const { newPassword, confirmPassword } = req.body;
     const token = req.params.token;
@@ -79,10 +107,10 @@ const adminResetPassword = asyncWrapper(async (req, res, next) => {
     }
     await jwt.verify(token, secretKey);
     if (newPassword !== confirmPassword) {
-        return next(createCustomError("There is a differences in both password", 403))
+        return next(createCustomError("There is a differences in both password", 403));
     }
-    const saltPassword = bcrypt.genSaltSync(10)
-    const hashPassword = bcrypt.hashSync(newPassword, saltPassword)
+    const saltPassword = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(newPassword, saltPassword);
 
     const updatePassword = await Admin.findByIdAndUpdate(req.params.id, {
         password: hashPassword
@@ -96,5 +124,6 @@ const adminResetPassword = asyncWrapper(async (req, res, next) => {
 module.exports = { createAdmin,
     adminResetPassword,
     adminLogin,
-    adminForgotPassword
+    adminForgotPassword,
+    adminChangePassword
  };
