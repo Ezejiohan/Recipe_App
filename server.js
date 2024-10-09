@@ -1,19 +1,13 @@
 require ('dotenv').config()
-const express = require("express");
-const {route} = require('./routes/admins');
-require('./database/database');
+const mongoose = require('mongoose')
 
-const app = express();
-const {notFound} = require('./middleware/not_found');
-const errorHandlerMiddleware = require('./middleware/errorHandler');
+const app = require('./app');
 
-app.use(express());
-app.use('/', route);
-app.use(notFound);
-app.use(errorHandlerMiddleware);
-
-const PORT = 7000
-
-app.listen(process.env.PORT, () => {
-    console.log('app is listenting on PORT ' + process.env.PORT)
+mongoose.connect(process.env.DATABASE).then(() => {
+    console.log('MongoDB Connected....')
+    app.listen(process.env.PORT, () => {
+        console.log('app is listening on PORT ' + process.env.PORT)
+    });
+}).catch((err) => {
+    console.log(err.message)
 });
