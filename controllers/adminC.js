@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const asyncWrapper = require('../middleware/async');
 const { createCustomError } = require('../errors/custom_error');
-const { fetchAdmin, registerAdmin } = require('../repository/admin');
+const { fetchAdmin, registerAdmin, fetchAdminById, updateAdmin } = require('../repository/admin');
 
 const createAdmin = asyncWrapper(async (req, res, next) => {
     const { firstname, lastname, email, password } = req.body
@@ -36,7 +36,7 @@ const adminLogin = asyncWrapper(async (req, res, next) => {
     const generatedToken = jwt.sign({
         id: admin._id,
         email: admin.email,
-    }, secretKey, { expiresIn: '12h' });
+    }, process.env.TOKEN, { expiresIn: '12h' });
     const result = {
         id: admin._id,
         email: admin.email,
@@ -47,24 +47,28 @@ const adminLogin = asyncWrapper(async (req, res, next) => {
 
 const adminChangePassword = asyncWrapper(async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
-    const admin = await fetchAdmin({ email: req.body.email })
-
-    const comparePassword = await bcrypt.compare(oldPassword, admin.password)
-    if (comparePassword !== true) {
-        return next(createCustomError("Password incorrect", 404))
+    const { id } = req.params;
+    const admin = await fetchAdminById(id);
+    if (!admin) {
+        return next(createCustomError("Admin not found", 404));
     }
-    const saltPassword = bcrypt.genSaltSync(10)
+
+    const comparePassword = await bcrypt.compare(oldPassword, admin.password);
+    if (comparePassword !== true) {
+        return next(createCustomError("Password incorrect", 404));
+    }
+    const saltPassword = bcrypt.genSaltSync(10);
     const hashPassword = bcrypt.hashSync(newPassword, saltPassword);
 
     if (newPassword === oldPassword) {
         return next(createCustomError("Unauthorized", 404));
     }
     admin.password = hashPassword
-    sendEmail({
+    /*sendEmail({
         email: admin.email,
         subject: "Password change alert",
         message: "You have changed your password. If not you alert us"
-    });
+    });*/
     const result = {
         fullname: admin.fullname,
         email: admin.email
@@ -82,7 +86,7 @@ const adminForgotPassword = asyncWrapper(async (req, res, next) => {
     const token = jwt.sign({
         id: admin._id,
         email: admin.email
-    }, secretKey)
+    }, process.env.TOKEN)
 
     const passwordChangeLink = `${req.protocol}://${req.get("host")}/admins/change_password/${admin._id}/${token}`;
     const message = `Click this link: ${passwordChangeLink} to set a new password`;
@@ -101,18 +105,18 @@ const adminForgotPassword = asyncWrapper(async (req, res, next) => {
 const adminResetPassword = asyncWrapper(async (req, res, next) => {
     const { newPassword, confirmPassword } = req.body;
     const token = req.params.token;
-    const admin = await Admin.findById(req.params.id)
+    const admin = await fetchAdminById(req.params.id)
     if (!admin) {
         return next(createCustomError("Admin not found", 404))
     }
-    await jwt.verify(token, secretKey);
+    await jwt.verify(token, process.env.TOKEN);
     if (newPassword !== confirmPassword) {
         return next(createCustomError("There is a differences in both password", 403));
     }
     const saltPassword = bcrypt.genSaltSync(10);
     const hashPassword = bcrypt.hashSync(newPassword, saltPassword);
 
-    const updatePassword = await Admin.findByIdAndUpdate(req.params.id, {
+    const updatePassword = await updateAdmin(req.params.id, {
         password: hashPassword
     });
 
