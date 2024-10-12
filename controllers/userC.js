@@ -6,7 +6,7 @@ const { fetchUser, registerUser } = require('../repository/user');
 
 const createUser = asyncWrapper(async(req, res, next) => {
     const { firstname, lastname, email, password } = req.body;
-    const userExist = await fetchUser({ email })
+    const userExist = await fetchUser({ email });
     if (userExist) {
         return next(createCustomError("User already exist", 403))
     }
@@ -18,9 +18,9 @@ const createUser = asyncWrapper(async(req, res, next) => {
         lastname,
         email,
         password: hashPassword
-    })
+    });
 
     res.status(201).json({ msg: 'User created successfully', user: newUser });
-})
+});
 
 module.exports = { createUser }
