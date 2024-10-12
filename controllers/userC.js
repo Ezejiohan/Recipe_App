@@ -22,5 +22,27 @@ const createUser = asyncWrapper(async(req, res, next) => {
 
     res.status(201).json({ msg: 'User created successfully', user: newUser });
 });
+ const userLogin = asyncWrapper(async (req, res, next) => {
+    const userLoginRequest = { email: req.body.email, password: req.body.password };
+    const user = await fetchUser({ email: req.body.email });
+    if (!user) {
+        return next(createCustomError("User not found", 404));
+    }
 
-module.exports = { createUser }
+    const correctPassword = await bcrypt.compare(userLoginRequest.password, user.password );
+    if (correctPassword === false) {
+        return next(createCustomError('Invalid email or password', 404));
+    }
+    const generatedToken = jwt.sign({
+        id: user._id,
+        email: user.email
+    }, process.env.TOKEN, { expiresIn: '12h' });
+    const result = {
+        id: user._id,
+        email: user.email,
+        token: generatedToken
+    }
+    return res.status(200).json({ msg: "userLogin successful", result });
+ });
+
+module.exports = { createUser, userLogin }
