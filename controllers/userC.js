@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const asyncWrapper = require('../middleware/async');
 const { createCustomError } = require('../errors/custom_error');
-const { fetchUser, registerUser } = require('../repository/user');
+const { fetchUser, registerUser, fetchUserById } = require('../repository/user');
 
 const createUser = asyncWrapper(async(req, res, next) => {
     const { firstname, lastname, email, password } = req.body;
@@ -45,4 +45,38 @@ const createUser = asyncWrapper(async(req, res, next) => {
     return res.status(200).json({ msg: "userLogin successful", result });
  });
 
-module.exports = { createUser, userLogin }
+const changeUserPassword = asyncWrapper(async(req, res, next) => {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.params;
+    const user = await fetchUserById(id);
+    if (!user) {
+        return next(createCustomError("User not found", 404));
+    }
+    const comparePassword = await bcrypt.compare(oldPassword, user.password);
+    if (comparePassword !== true) {
+        return next(createCustomError("Password incorrect", 404));
+    }
+    const saltPassword = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(newPassword, saltPassword);
+    if (newPassword === oldPassword) {
+        return next(createCustomError("Password are similar", 404));
+    }
+    user.password = hashPassword
+    /*sendEmail({
+        email: user.email,
+        subject: "Password change alert",
+        message: "You have changed your password. If not you alert us"
+    });*/
+    const result = {
+        fullname: user.fullname,
+        email: user.email
+    }
+    await user.save();
+
+    return res.status(200).json({ msg: "Password changed successful", result });
+});
+
+module.exports = { createUser, 
+    userLogin,
+    changeUserPassword
+}
