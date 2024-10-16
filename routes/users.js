@@ -4,6 +4,6 @@ const { createUser, userLogin } = require('../controllers/userC');
 const userRoute = express.Router();
 
 userRoute.post('/register', (createUser));
-userRoute.post('/userLogin', (userLogin));
+userRoute.post('/login', (userLogin));
 
 module.exports = { userRoute };
