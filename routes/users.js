@@ -4,6 +4,6 @@ const { createUser, resetUserPassword } = require('../controllers/userC');
 const userRoute = express.Router();
 
 userRoute.post('/register', (createUser));
-userRoute.patch('/resetUserPassword/:id/:token', (resetUserPassword));
+userRoute.patch('/:id/:token', (resetUserPassword));
 
 module.exports = { userRoute };

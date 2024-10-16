@@ -46,4 +46,6 @@ const resetUserPassword = asyncWrapper(async (req, res, next) => {
     res.status(200).json({ msg: "Password reset successful", updatePassword });
 });
 
-module.exports = { createUser, resetUserPassword }
+module.exports = { createUser, 
+    resetUserPassword 
+}
