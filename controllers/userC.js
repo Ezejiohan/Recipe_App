@@ -47,4 +47,6 @@ const userForgotPassword = asyncWrapper(async (req, res, next) => {
     });
 });
 
-module.exports = { createUser, userForgotPassword }
+module.exports = { createUser, 
+    userForgotPassword 
+}
