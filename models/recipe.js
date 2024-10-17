@@ -4,7 +4,7 @@ const recipeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    ingredient: [{
+    ingredients: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Ingredients',
             required: true
@@ -13,7 +13,7 @@ const recipeSchema = new mongoose.Schema({
             type: String,
             required: true
     }],
-    admin: {
+    adminId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admins',
         required: true
