@@ -11,3 +11,7 @@ exports.registerUser = async (options) => {
 exports.fetchUserById = async (options) => {
     return await User.findById(options);
 };
+
+exports.updateUser = async (options) => {
+    return await User.findByIdAndUpdate(options)
+};
