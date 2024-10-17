@@ -46,6 +46,4 @@ const userLogin = asyncWrapper(async (req, res, next) => {
     return res.status(200).json({ msg: "userLogin successful", result });
  });
 
-module.exports = { createUser, 
-    userLogin 
-}
+module.exports = { createUser, userLogin }
