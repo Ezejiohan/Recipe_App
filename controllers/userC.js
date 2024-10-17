@@ -43,7 +43,7 @@ const userLogin = asyncWrapper(async (req, res, next) => {
         email: user.email,
         token: generatedToken
     }
-    return res.status(200).json({ msg: "userLogin successful", result });
+    return res.status(200).json({ message: "User login successful", result });
  });
 
 module.exports = { createUser, userLogin }
