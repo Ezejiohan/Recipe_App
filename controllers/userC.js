@@ -34,16 +34,20 @@ const userLogin = asyncWrapper(async (req, res, next) => {
     if (correctPassword === false) {
         return next(createCustomError('Invalid email or password', 401));
     }
+    
     const generatedToken = jwt.sign({
         id: user._id,
         email: user.email
     }, process.env.TOKEN, { expiresIn: '12h' });
+
     const result = {
         id: user._id,
         email: user.email,
         token: generatedToken
     }
+
     return res.status(200).json({ message: "User login successful", result });
+
  });
 
 module.exports = { createUser, userLogin }
