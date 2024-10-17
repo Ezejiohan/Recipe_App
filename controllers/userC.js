@@ -28,6 +28,7 @@ const userForgotPassword = asyncWrapper(async (req, res, next) => {
     if (!user) {
         return next(createCustomError('User not found', 404));
     }
+
     const token = jwt.sign({
         id: user._id,
         email: user.email
@@ -45,8 +46,7 @@ const userForgotPassword = asyncWrapper(async (req, res, next) => {
     res.status(200).json({
         message: "Email has been sent"
     });
+
 });
 
-module.exports = { createUser, 
-    userForgotPassword 
-}
+module.exports = { createUser, userForgotPassword }
