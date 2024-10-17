@@ -43,9 +43,60 @@ const resetUserPassword = asyncWrapper(async (req, res, next) => {
 
     await user.save();
 
-    res.status(200).json({ msg: "Password reset successful", updatePassword });
+    res.status(200).json({ message: "Password reset successful", updatePassword });
 });
 
-module.exports = { createUser, 
-    resetUserPassword 
-}
+const userForgotPassword = asyncWrapper(async (req, res, next) => {
+    const user = await fetchUser({ email: req.body.email });
+    if (!user) {
+        return next(createCustomError('User not found', 404));
+    }
+
+    const token = jwt.sign({
+        id: user._id,
+        email: user.email
+    }, process.env.TOKEN)
+
+    const passwordChangeLink = `${req.protocol}://${req.get("host")}/userss/change_password/${user._id}/${token}`;
+    const message = `Click this link: ${passwordChangeLink} to set a new password`;
+
+    sendEmail({
+        email: user.email,
+        subject: 'Forget password link',
+        message: message
+    });
+
+    res.status(200).json({
+        message: "Email has been sent"
+    });
+
+});
+
+const userLogin = asyncWrapper(async (req, res, next) => {
+    const { email, password } = req.body;
+    const user = await fetchUser({ email });
+    if (!user) {
+        return next(createCustomError("User not found", 404));
+    }
+
+    const correctPassword = await bcrypt.compare(password, user.password );
+    if (correctPassword === false) {
+        return next(createCustomError('Invalid email or password', 401));
+    }
+    
+    const generatedToken = jwt.sign({
+        id: user._id,
+        email: user.email
+    }, process.env.TOKEN, { expiresIn: '12h' });
+
+    const result = {
+        id: user._id,
+        email: user.email,
+        token: generatedToken
+    }
+
+    return res.status(200).json({ message: "User login successful", result });
+
+ });
+
+module.exports = { createUser, userLogin, userForgotPassword, resetUserPassword }
