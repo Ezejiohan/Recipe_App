@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { createAdmin, adminResetPassword, adminLogin, adminForgotPassword, adminChangePassword } = require('../controllers/adminC');
+const { createAdmin, adminResetPassword, adminLogin, adminForgotPassword, adminChangePassword } = require('../controllers/admin');
 
 const route = express.Router();
 
