@@ -23,6 +23,48 @@ const createUser = asyncWrapper(async(req, res, next) => {
     res.status(201).json({ msg: 'User created successfully', user: newUser });
 });
 
+const changeUserPassword = asyncWrapper(async(req, res, next) => {
+    const { oldPassword, newPassword } = req.body;
+    const { id } = req.params;
+    const user = await fetchUserById(id);
+
+    if (!user) {
+        return next(createCustomError("User not found", 404));
+    }
+
+    const comparePassword = await bcrypt.compare(oldPassword, user.password);
+
+    if (comparePassword !== true) {
+        return next(createCustomError("Password incorrect", 401));
+    }
+
+    const saltPassword = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(newPassword, saltPassword);
+
+    if (newPassword === oldPassword) {
+        return next(createCustomError("Password are similar", 400));
+    }
+
+    user.password = hashPassword;
+
+    sendEmail({
+        email: user.email,
+        subject: "Password change alert",
+        message: "You have changed your password. If not you alert us"
+    });
+
+    const result = {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email
+    }
+
+    await user.save();
+
+    return res.status(200).json({ msg: "Password changed successful", result });
+    
+});
+
 const resetUserPassword = asyncWrapper(async (req, res, next) => {
     const { newPassword, confirmPassword } = req.body;
     const token = req.params.token;
@@ -99,4 +141,4 @@ const userLogin = asyncWrapper(async (req, res, next) => {
 
  });
 
-module.exports = { createUser, userLogin, userForgotPassword, resetUserPassword }
+module.exports = { createUser, userLogin, userForgotPassword, resetUserPassword, changeUserPassword }
