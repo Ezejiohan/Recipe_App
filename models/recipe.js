@@ -10,7 +10,7 @@ const recipeSchema = new mongoose.Schema({
             required: true
     }],
     steps: [{
-            type: String,
+            type: JSON,
             required: true
     }],
     adminId: {

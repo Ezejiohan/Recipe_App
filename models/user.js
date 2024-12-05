@@ -25,7 +25,43 @@ const userSchema = new mongoose.Schema({
     verified: {
         type: Boolean,
         default: false
-    }
+    },
+    profilePicture: {
+        type: String,
+        default: null
+    },
+    bio: {
+        type: String, 
+        maxlength: 250,
+        default: ""
+    },
+    phone: {
+        type: String, 
+        trim: true,
+        default: null
+    },
+    address: {
+        street: {
+            type: String,
+            default: ""
+        },
+        city: {
+            type: String,
+            default: ""
+        },
+        state: {
+            type: String,
+            default: ""
+        },
+        postalCode: {
+            type: String,
+            default: ""
+        },
+        country: {
+            type: String,
+            default: ""
+        }
+    },
 });
 
 const User = mongoose.model('Users', userSchema);
