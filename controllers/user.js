@@ -2,7 +2,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const asyncWrapper = require('../middleware/async');
 const { createCustomError } = require('../errors/custom_error');
-const { fetchUser, registerUser, fetchUserById, updateUser } = require('../repository/user');
+const { fetchUser, registerUser, fetchUserById, updateUser, userPool, deleteUser } = require('../repository/user');
+const { fetchRecipeById, recipePool } = require('../repository/recipe');
 
 const createUser = asyncWrapper(async(req, res, next) => {
     const { firstname, lastname, email, password } = req.body;
@@ -150,4 +151,66 @@ const userLogin = asyncWrapper(async (req, res, next) => {
 
  });
 
-module.exports = { createUser, userLogin, userForgotPassword, resetUserPassword, changeUserPassword }
+const getAllUsers = asyncWrapper(async(req, res, next) => {
+    const user = await userPool();
+
+        res.status(200).json({
+            status: 'Success',
+            numbersOfUsers: user.length,
+            data: user
+        });
+});   
+
+const terminateUser = asyncWrapper(async(req, res, next) => {
+    const { userId } = req.params
+
+    const user = await fetchUser({ _id: userId });
+    if (!user) {
+        return next(createCustomError("User not found", 404))
+    } else {
+        await deleteUser({ _id: userId });
+    }
+
+    return res.status(200).json({
+        message: "User deleted Successful"
+    });
+
+});
+
+const getARecipe = asyncWrapper(async(req, res, next) => {
+    const { recipeId } = req.params;
+  
+    const recipe = await fetchRecipeById(recipeId);
+    if (!recipe) {
+      return next(createCustomError("Recipe not found", 404));
+    }
+  
+    return res.status(200).json({
+      message: "Recipe retrieved successfully",
+      recipe,
+    });
+
+});  
+
+const getAllRecipess = asyncWrapper(async(req, res, next) => {
+    const recipe = await recipePool();
+  
+    res.status(200).json({
+        status: 'Success',
+        numbersOfrecipes: recipe.length,
+        data: recipe
+    });
+
+});   
+
+module.exports = { 
+    createUser, 
+    userLogin, 
+    userForgotPassword, 
+    resetUserPassword, 
+    changeUserPassword, 
+    getAllUsers, 
+    terminateUser,
+    getARecipe,
+    getAllRecipess
+}

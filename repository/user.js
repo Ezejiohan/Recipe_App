@@ -15,3 +15,11 @@ exports.fetchUserById = async (options) => {
 exports.updateUser = async (options) => {
     return await User.findByIdAndUpdate(options)
 };
+
+exports.userPool = async (options) => {
+    return await User.find(options)
+};
+
+exports.deleteUser = async (options) => {
+    return await User.deleteOne(options)
+};
